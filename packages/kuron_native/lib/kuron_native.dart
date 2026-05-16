@@ -1,0 +1,233 @@
+import 'kuron_native_platform_interface.dart';
+import 'dart:typed_data';
+
+export 'utils/backup_utils.dart'; // Export for users
+export 'widgets/kuron_widgets.dart'; // Export Widgets
+export 'widgets/animated_webp_view.dart'; // Export native animated-WebP viewer
+export 'src/doh_provider.dart'; // Export DoH provider constants
+
+class KuronNative {
+  /// Singleton instance
+  static final KuronNative instance = KuronNative();
+
+  Future<String?> getPlatformVersion() {
+    return KuronNativePlatform.instance.getPlatformVersion();
+  }
+
+  /// Get System Info. Types: 'ram', 'storage', 'battery'
+  Future<Map<Object?, Object?>?> getSystemInfo(String type) {
+    return KuronNativePlatform.instance.getSystemInfo(type);
+  }
+
+  /// Pick a directory using the native system picker.
+  /// Returns the path if selected, or null if cancelled.
+  Future<String?> pickDirectory() {
+    return KuronNativePlatform.instance.pickDirectory();
+  }
+
+  /// Pick a text file using native file picker and return file content.
+  Future<String?> pickTextFile({String? mimeType}) {
+    return KuronNativePlatform.instance.pickTextFile(mimeType: mimeType);
+  }
+
+  /// Pick a binary file using native file picker and return raw bytes.
+  Future<Uint8List?> pickBinaryFile({String? mimeType}) {
+    return KuronNativePlatform.instance.pickBinaryFile(mimeType: mimeType);
+  }
+
+  /// Pick a ZIP file using native file picker and return content URI.
+  /// Returns the content URI of the selected ZIP file, or null if cancelled.
+  Future<String?> pickZipFile() {
+    return KuronNativePlatform.instance.pickZipFile();
+  }
+
+  /// Read ZIP file bytes from content URI.
+  /// Returns the bytes of the ZIP file.
+  Future<Uint8List?> readZipBytes(String contentUri) {
+    return KuronNativePlatform.instance.readZipBytes(contentUri);
+  }
+
+  /// Resolve ZIP display name from content URI.
+  Future<String?> getZipDisplayName(String contentUri) {
+    return KuronNativePlatform.instance.getZipDisplayName(contentUri);
+  }
+
+  /// Extract ZIP file natively to destination directory with progress notifications.
+  ///
+  /// This is a native Android implementation that:
+  /// - Streams ZIP data directly to disk (no memory loading)
+  /// - Shows system notifications with progress
+  /// - Calls onProgress callback for real-time updates
+  ///
+  /// Returns a map with 'success', 'imageCount', and 'destinationPath'.
+  Future<Map<String, dynamic>?> extractZipFile({
+    required String contentUri,
+    required String destinationPath,
+    Function(int processed, int total, int imageCount, String currentFile)?
+    onProgress,
+  }) {
+    return KuronNativePlatform.instance.extractZipFile(
+      contentUri: contentUri,
+      destinationPath: destinationPath,
+      onProgress: onProgress,
+    );
+  }
+
+  Future<String?> startDownload({
+    required String url,
+    required String fileName,
+    String? destinationDir, // Optional: Subdirectory in Downloads
+    String? savePath,
+    String? title,
+    String? description,
+    String? mimeType,
+    String? cookie,
+    String? userAgent,
+  }) {
+    return KuronNativePlatform.instance.startDownload(
+      url: url,
+      fileName: fileName,
+      destinationDir: destinationDir,
+      savePath: savePath,
+      title: title,
+      description: description,
+      mimeType: mimeType,
+      cookie: cookie,
+      userAgent: userAgent,
+    );
+  }
+
+  Future<Map<String, dynamic>?> convertImagesToPdf({
+    required List<String> imagePaths,
+    required String outputPath,
+    Function(int progress, String message)? onProgress,
+  }) {
+    return KuronNativePlatform.instance.convertImagesToPdf(
+      imagePaths: imagePaths,
+      outputPath: outputPath,
+      onProgress: onProgress,
+    );
+  }
+
+  Future<void> openWebView({
+    required String url,
+    bool enableJavaScript = true,
+  }) {
+    return KuronNativePlatform.instance.openWebView(
+      url: url,
+      enableJavaScript: enableJavaScript,
+    );
+  }
+
+  /// Clears all cookies from the native WebView storage.
+  /// Useful for logout.
+  Future<void> clearCookies() {
+    return KuronNativePlatform.instance.clearCookies();
+  }
+
+  Future<Object?> getThumbnailForWebP({
+    required String url,
+    String? filePath,
+    Map<String, String> headers = const {},
+    Function(int receivedBytes, int? totalBytes)? onProgress,
+  }) {
+    return KuronNativePlatform.instance.getThumbnailForWebP(
+      url: url,
+      filePath: filePath,
+      headers: headers,
+      onProgress: onProgress,
+    );
+  }
+
+  Future<Map<String, dynamic>?> showLoginWebView({
+    required String url,
+    List<String>? successUrlFilters,
+    String? initialCookie,
+    String? userAgent,
+    String? autoCloseOnCookie,
+    String? ssoRedirectUrl,
+    List<String>? domImageSelectors,
+    List<String>? domImageAttributes,
+    List<String>? domLinkSelectors,
+    bool enableAdBlock = false,
+    bool clearCookies = false,
+  }) {
+    return KuronNativePlatform.instance.showLoginWebView(
+      url: url,
+      successUrlFilters: successUrlFilters,
+      initialCookie: initialCookie,
+      userAgent: userAgent,
+      autoCloseOnCookie: autoCloseOnCookie,
+      ssoRedirectUrl: ssoRedirectUrl,
+      domImageSelectors: domImageSelectors,
+      domImageAttributes: domImageAttributes,
+      domLinkSelectors: domLinkSelectors,
+      enableAdBlock: enableAdBlock,
+      clearCookies: clearCookies,
+    );
+  }
+
+  Future<Map<String, dynamic>?> showCaptchaWebView({
+    required String provider,
+    required String siteKey,
+    String? baseUrl,
+  }) {
+    return KuronNativePlatform.instance.showCaptchaWebView(
+      provider: provider,
+      siteKey: siteKey,
+      baseUrl: baseUrl,
+    );
+  }
+
+  Future<void> openPdf({
+    required String filePath,
+    String? title,
+    int? startPage,
+  }) {
+    return KuronNativePlatform.instance.openPdf(
+      filePath: filePath,
+      title: title,
+      startPage: startPage,
+    );
+  }
+
+  /// Set DNS over HTTPS provider.
+  /// Provider values: -1 (disabled), 1 (Cloudflare), 2 (Google), 3 (AdGuard), 4 (Quad9)
+  Future<bool> setDohProvider(int provider) {
+    return KuronNativePlatform.instance.setDohProvider(provider);
+  }
+
+  /// Get current DNS over HTTPS provider.
+  /// Returns: -1 (disabled), 1 (Cloudflare), 2 (Google), 3 (AdGuard), 4 (Quad9)
+  Future<int> getDohProvider() {
+    return KuronNativePlatform.instance.getDohProvider();
+  }
+
+  /// Make HTTP request using native OkHttp with DoH support.
+  /// Returns map with 'statusCode', 'body', and 'headers'.
+  Future<Map<String, dynamic>> makeHttpRequest({
+    required String url,
+    String method = 'GET',
+    Map<String, String>? headers,
+    String? body,
+  }) {
+    return KuronNativePlatform.instance.makeHttpRequest(
+      url: url,
+      method: method,
+      headers: headers,
+      body: body,
+    );
+  }
+
+  /// Download binary data (images, files) using native OkHttp with DoH support.
+  /// Returns raw bytes.
+  Future<Uint8List> downloadBinary({
+    required String url,
+    Map<String, String>? headers,
+  }) {
+    return KuronNativePlatform.instance.downloadBinary(
+      url: url,
+      headers: headers,
+    );
+  }
+}
